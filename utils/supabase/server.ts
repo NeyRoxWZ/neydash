@@ -8,14 +8,12 @@ export async function createClient() {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error(
-      'Missing Supabase Environment Variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)'
-    )
+    console.error('CRITICAL: Missing Supabase Environment Variables')
   }
 
   return createServerClient(
-    supabaseUrl,
-    supabaseKey,
+    supabaseUrl || 'https://placeholder.supabase.co',
+    supabaseKey || 'placeholder',
     {
       cookies: {
         get(name: string) {

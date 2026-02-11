@@ -183,8 +183,8 @@ export default function InstancesClientPage() {
           <TableHeader>
             <TableRow className="hover:bg-transparent border-white/[0.05]">
               <TableHead className="w-[100px]">Slot</TableHead>
-              <TableHead>Process Name</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Nom du Processus</TableHead>
+              <TableHead>Statut</TableHead>
               <TableHead>CPU / RAM</TableHead>
               <TableHead>Uptime</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -220,7 +220,11 @@ export default function InstancesClientPage() {
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(bot.status)}`}>
-                      {bot.status}
+                      {bot.status === 'online' ? 'EN LIGNE' : 
+                       bot.status === 'stopped' ? 'ARRÊTÉ' : 
+                       bot.status === 'error' ? 'ERREUR' : 
+                       bot.status === 'launching' ? 'LANCEMENT' : 
+                       bot.status === 'restarting' ? 'REDÉMARRAGE' : bot.status}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -248,45 +252,31 @@ export default function InstancesClientPage() {
                         size="icon" 
                         className="h-8 w-8 hover:bg-blue-500/10 hover:text-blue-500"
                         title="Redémarrer"
-                        disabled={isActionLoading === `restart-${bot.slot_id}`}
                         onClick={() => handleAction(bot, 'restart')}
+                        disabled={isActionLoading === `restart-${bot.slot_id}`}
                       >
                         <RotateCcw className={`w-4 h-4 ${isActionLoading === `restart-${bot.slot_id}` ? 'animate-spin' : ''}`} />
                       </Button>
-                      
-                      {bot.status === 'online' ? (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 hover:bg-yellow-500/10 hover:text-yellow-500"
-                          title="Arrêter"
-                          disabled={isActionLoading === `stop-${bot.slot_id}`}
-                          onClick={() => handleAction(bot, 'stop')}
-                        >
-                          <Square className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 hover:bg-green-500/10 hover:text-green-500"
-                          title="Démarrer"
-                          disabled={isActionLoading === `restart-${bot.slot_id}`}
-                          onClick={() => handleAction(bot, 'restart')}
-                        >
-                          <Play className="w-4 h-4" />
-                        </Button>
-                      )}
-                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 hover:bg-yellow-500/10 hover:text-yellow-500"
+                        title="Arrêter"
+                        onClick={() => handleAction(bot, 'stop')}
+                        disabled={isActionLoading === `stop-${bot.slot_id}`}
+                      >
+                        <Square className="w-4 h-4" />
+                      </Button>
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         className="h-8 w-8 hover:bg-red-500/10 hover:text-red-500"
-                        title="Supprimer (PM2 & DB)"
+                        title="Supprimer"
                         onClick={() => {
                           setSelectedBot(bot)
                           setIsDeleteModalOpen(true)
                         }}
+                        disabled={isActionLoading === `delete-${bot.slot_id}`}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -299,34 +289,25 @@ export default function InstancesClientPage() {
         </Table>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Modal de suppression */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent className="bg-[#0A0A0A] border-white/[0.05]">
+        <DialogContent className="bg-[#0A0A0A] border-white/[0.05] text-[#fafafa]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-500">
-              <AlertCircle className="w-5 h-5" />
-              Supprimer l'instance ?
-            </DialogTitle>
-            <DialogDescription>
-              Cette action va arrêter le bot #{selectedBot?.slot_id}, le supprimer de PM2 et **supprimer sa base de données locale**.
-              Cette action est irréversible.
+            <DialogTitle>Supprimer l'instance ?</DialogTitle>
+            <DialogDescription className="text-[#a1a1aa]">
+              Cette action est irréversible. L'instance #{selectedBot?.slot_id} sera définitivement supprimée de PM2.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2">
             <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>
               Annuler
             </Button>
             <Button 
               variant="destructive" 
               onClick={() => selectedBot && handleAction(selectedBot, 'delete')}
-              disabled={isActionLoading === `delete-${selectedBot?.slot_id}`}
+              disabled={isActionLoading?.startsWith('delete-')}
             >
-              {isActionLoading === `delete-${selectedBot?.slot_id}` ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Trash2 className="w-4 h-4 mr-2" />
-              )}
-              Confirmer la suppression
+              {isActionLoading?.startsWith('delete-') ? 'Suppression...' : 'Supprimer'}
             </Button>
           </DialogFooter>
         </DialogContent>

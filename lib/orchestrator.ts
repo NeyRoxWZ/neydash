@@ -1,19 +1,40 @@
 const ORCHESTRATOR_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL
-const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET
+const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET || ''
 
 async function orchestratorFetch(path: string, options: RequestInit = {}) {
-  const response = await fetch(`${ORCHESTRATOR_URL}${path}`, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${ORCHESTRATOR_SECRET}`,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  })
-  if (!response.ok) {
-    throw new Error(`Orchestrator error: ${response.statusText}`)
+  if (!ORCHESTRATOR_URL) {
+    console.error('ORCHESTRATOR_URL is not defined in environment variables')
+    return { 
+      success: false, 
+      error: 'URL de l\'orchestrateur non configurée. Veuillez définir NEXT_PUBLIC_ORCHESTRATOR_URL.' 
+    }
   }
-  return response.json()
+
+  try {
+    const baseUrl = ORCHESTRATOR_URL.endsWith('/') ? ORCHESTRATOR_URL.slice(0, -1) : ORCHESTRATOR_URL
+    const fullUrl = `${baseUrl}${path.startsWith('/') ? path : '/' + path}`
+    
+    const response = await fetch(fullUrl, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${ORCHESTRATOR_SECRET}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`Orchestrator error (${response.status}): ${errorText}`)
+      return { success: false, error: `Erreur Orchestrateur: ${response.statusText}` }
+    }
+
+    return await response.json()
+  } catch (error: any) {
+    console.error('Fetch error to orchestrator:', error)
+    return { success: false, error: error.message || 'Erreur de connexion à l\'orchestrateur' }
+  }
 }
 
 export async function getOrchestratorStatus() {

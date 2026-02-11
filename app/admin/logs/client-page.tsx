@@ -107,7 +107,7 @@ export default function LogsClientPage() {
             className={autoRefresh ? "bg-green-600 hover:bg-green-700" : ""}
           >
             <Clock className="w-4 h-4 mr-2" />
-            {autoRefresh ? "Auto-refresh: ON" : "Auto-refresh: OFF"}
+            {autoRefresh ? "Auto-actualisation : ON" : "Auto-actualisation : OFF"}
           </Button>
           <Button 
             variant="outline" 
@@ -153,7 +153,7 @@ export default function LogsClientPage() {
             className="h-8 text-xs px-4"
             onClick={() => setLogType('out')}
           >
-            Output (STDOUT)
+            Sortie (STDOUT)
           </Button>
           <Button 
             variant={logType === 'err' ? 'secondary' : 'ghost'} 
@@ -161,7 +161,7 @@ export default function LogsClientPage() {
             className={`h-8 text-xs px-4 ${logType === 'err' ? 'text-red-500' : ''}`}
             onClick={() => setLogType('err')}
           >
-            Errors (STDERR)
+            Erreurs (STDERR)
           </Button>
         </div>
 
@@ -198,12 +198,12 @@ export default function LogsClientPage() {
       <div className="flex items-center gap-4 text-[10px] text-muted-foreground uppercase tracking-widest shrink-0">
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          Live Stream Active
+          Flux en direct actif
         </div>
         <div>•</div>
-        <div>Buffer: 200 lines</div>
+        <div>Tampon : 200 lignes</div>
         <div>•</div>
-        <div>Poll Interval: 5s</div>
+        <div>Intervalle : 5s</div>
       </div>
     </div>
   )

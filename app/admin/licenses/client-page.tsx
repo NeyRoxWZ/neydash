@@ -97,8 +97,8 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-[#fafafa]">Licenses</h2>
-          <p className="text-[#a1a1aa]">Manage and monitor your product licenses.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-[#fafafa]">Licences</h2>
+          <p className="text-[#a1a1aa]">Gérez et surveillez vos licences produit.</p>
         </div>
         <Button onClick={() => {
           setNewLicenseKey(null)
@@ -114,75 +114,122 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
           <TableHeader>
             <TableRow>
               <TableHead>Clé</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Statut</TableHead>
               <TableHead>Client ID</TableHead>
               <TableHead>Expiration</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {licenses.map((license) => (
-              <TableRow key={license.id}>
-                <TableCell className="w-[280px]">
-                  <DoubleClickReveal 
-                    value={license.license_key} 
-                    label="Licence"
-                    masked={license.license_key.substring(0, 4) + "****" + license.license_key.substring(license.license_key.length - 4)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(license.status)}`}>
-                    {license.status}
-                  </span>
-                </TableCell>
-                <TableCell className="w-[200px]">
-                  {license.client_id ? (
-                    <DoubleClickReveal 
-                      value={license.client_id} 
-                      label="Client ID"
-                      masked={license.client_id.substring(0, 4) + "****"}
-                    />
-                  ) : (
-                    <span className="text-muted-foreground italic text-xs">Non activée</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-xs">
-                    <Calendar className="w-3 h-3 text-muted-foreground" />
-                    {license.expiresat ? new Date(license.expiresat).toLocaleDateString() : 'Jamais'}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => {
-                        setSelectedLicense(license)
-                        setEditExpiresAt(license.expiresat ? new Date(license.expiresat).toISOString().slice(0, 16) : "")
-                        setIsEditModalOpen(true)
-                      }}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-red-500 hover:bg-red-500/10"
-                      onClick={() => {
-                        setSelectedLicense(license)
-                        setIsDeleteModalOpen(true)
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+            {licenses.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                  Aucune licence trouvée.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              licenses.map((license) => (
+                <TableRow key={license.id}>
+                  <TableCell className="w-[280px]">
+                    <DoubleClickReveal 
+                      value={license.license_key} 
+                      label="Licence"
+                      masked={license.license_key.substring(0, 4) + "****" + license.license_key.substring(license.license_key.length - 4)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(license.status)}`}>
+                      {license.status === 'active' ? 'ACTIVE' : 
+                       license.status === 'expired' ? 'EXPIRÉE' : license.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="w-[200px]">
+                    {license.client_id ? (
+                      <DoubleClickReveal 
+                        value={license.client_id} 
+                        label="Client ID"
+                        masked={license.client_id.substring(0, 4) + "****"}
+                      />
+                    ) : (
+                      <span className="text-muted-foreground italic text-xs">Non activée</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Calendar className="w-3 h-3 text-muted-foreground" />
+                      {license.expiresat ? new Date(license.expiresat).toLocaleDateString() : 'Jamais'}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        title="Modifier l'expiration"
+                        onClick={() => {
+                          setSelectedLicense(license)
+                          setEditExpiresAt(license.expiresat ? new Date(license.expiresat).toISOString().slice(0, 16) : "")
+                          setIsEditModalOpen(true)
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        title="Supprimer"
+                        className="text-red-500 hover:bg-red-500/10"
+                        onClick={() => {
+                          setSelectedLicense(license)
+                          setIsDeleteModalOpen(true)
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Modal d'édition */}
+      <Modal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)}
+        title="Modifier l'expiration"
+        description="Changez la date d'expiration de cette licence."
+      >
+        <div className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Date d'expiration</label>
+            <Input 
+              type="datetime-local" 
+              value={editExpiresAt}
+              onChange={(e) => setEditExpiresAt(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="ghost" onClick={() => setIsEditModalOpen(false)}>Annuler</Button>
+            <Button onClick={handleUpdateLicense}>Enregistrer</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal de suppression */}
+      <Modal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Supprimer la licence"
+        description="Êtes-vous sûr de vouloir supprimer cette licence ? Cette action est irréversible."
+      >
+        <div className="flex justify-end gap-3 pt-4">
+          <Button variant="ghost" onClick={() => setIsDeleteModalOpen(false)}>Annuler</Button>
+          <Button variant="destructive" onClick={handleDeleteLicense}>Supprimer</Button>
+        </div>
+      </Modal>
 
       {/* Create Modal */}
       <Modal 
