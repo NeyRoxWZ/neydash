@@ -25,9 +25,11 @@ export async function fetchInstancesAction() {
       bots.forEach((bot: any) => {
         if (bot.license_key && licenseMap.has(bot.license_key)) {
           const l = licenseMap.get(bot.license_key)
-          bot.discord_username = l.discord_username
-          bot.discord_avatar = l.discord_avatar
-          bot.client_id = l.client_id
+          if (l) {
+            bot.discord_username = l.discord_username
+            bot.discord_avatar = l.discord_avatar
+            bot.client_id = l.client_id
+          }
         }
       });
     }
