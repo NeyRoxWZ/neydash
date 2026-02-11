@@ -1,10 +1,10 @@
-"use client"
+import InstancesClientPage from "./client-page"
+
+export const metadata = {
+  title: "Instances | Admin Dashboard",
+  description: "Gérez vos instances de bots PM2",
+}
 
 export default function InstancesPage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold">Instances</h1>
-      <p>Manage your bot instances here.</p>
-    </div>
-  )
+  return <InstancesClientPage />
 }

@@ -1,10 +1,7 @@
-"use client"
+import { getLicensesAction } from './actions';
+import LicensesClientPage from './client-page';
 
-export default function LicensesPage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold">Licenses</h1>
-      <p>Manage your licenses here.</p>
-    </div>
-  )
+export default async function LicensesPage() {
+  const licenses = await getLicensesAction();
+  return <LicensesClientPage initialLicenses={licenses} />;
 }
