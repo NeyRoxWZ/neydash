@@ -7,7 +7,7 @@ export async function getStatsAction() {
   return await getOrchestratorStatus();
 }
 
-export async function restartBotsAction(type?: 'slotbot' | 'botgestion') {
+export async function restartBotsAction(type: 'all' | 'slotbot' | 'botgestion' = 'all') {
   const result = await restartBots(type);
   revalidatePath('/admin');
   return result;

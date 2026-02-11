@@ -28,10 +28,10 @@ import { toast } from "sonner"
 import { 
   fetchInstancesAction, 
   restartInstanceAction, 
-  stopInstanceAction, 
-  deleteInstanceAction 
+  stopInstanceAction,
+  deleteInstanceAction
 } from "./actions"
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,

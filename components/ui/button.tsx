@@ -1,22 +1,28 @@
 import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "danger" | "ghost" | "link"
+  variant?: "default" | "secondary" | "danger" | "ghost" | "link" | "outline" | "destructive"
   size?: "default" | "sm" | "lg" | "icon"
+  asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    
     const variants = {
       default: "bg-[#fafafa] text-[#09090b] hover:bg-[#e4e4e7] shadow-sm",
       secondary: "bg-transparent border border-[#27272a] text-[#fafafa] hover:bg-[#27272a]",
       danger: "text-[#ef4444] hover:bg-[#ef4444]/10",
       ghost: "hover:bg-[#27272a] text-[#fafafa]",
       link: "text-[#fafafa] underline-offset-4 hover:underline",
+      outline: "bg-transparent border border-[#27272a] text-[#fafafa] hover:bg-[#27272a]",
+      destructive: "bg-[#ef4444] text-[#fafafa] hover:bg-[#ef4444]/90 shadow-sm",
     }
-    
+
     const sizes = {
       default: "h-9 px-4 py-2",
       sm: "h-8 rounded-md px-3 text-xs",
@@ -25,11 +31,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <button
+      <Comp
         className={cn(
           "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-          variants[variant],
-          sizes[size],
+          variants[variant as keyof typeof variants],
+          sizes[size as keyof typeof sizes],
           className
         )}
         ref={ref}
