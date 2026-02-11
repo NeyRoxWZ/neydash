@@ -22,10 +22,12 @@ const data = [
   { name: "Sun", a: 34, b: 43 },
 ]
 
-export function OverviewChart() {
+export function OverviewChart({ data: propData }: { data?: any[] }) {
+  const chartData = propData && propData.length > 0 ? propData : data
+
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <AreaChart data={data}>
+      <AreaChart data={chartData}>
         <defs>
           <linearGradient id="colorA" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
