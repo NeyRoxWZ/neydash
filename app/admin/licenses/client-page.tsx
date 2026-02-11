@@ -186,8 +186,8 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
                           <span className="text-sm font-medium">
                             {license.discord_username || "Utilisateur Inconnu"}
                           </span>
-                          <div className="flex items-center gap-1.5 group/id">
-                            <span className="text-[10px] text-muted-foreground font-mono">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-muted-foreground font-mono bg-secondary/30 px-1.5 py-0.5 rounded border border-white/5">
                               {license.client_id}
                             </span>
                             <button 
@@ -195,10 +195,10 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
                                 navigator.clipboard.writeText(license.client_id || "")
                                 toast.success("ID copié !")
                               }}
-                              className="opacity-0 group-hover/id:opacity-100 p-0.5 hover:bg-white/10 rounded transition-all"
+                              className="p-1 hover:bg-white/10 rounded transition-all text-muted-foreground hover:text-primary"
                               title="Copier l'ID"
                             >
-                              <Copy className="w-2.5 h-2.5 text-muted-foreground" />
+                              <Copy className="w-3 h-3" />
                             </button>
                           </div>
                         </div>

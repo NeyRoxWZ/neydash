@@ -32,6 +32,7 @@ export default function SettingsClientPage() {
   const [settings, setSettings] = useState<any>({
     maintenance_mode: 'false',
     support_link: '',
+    dashboard_logo_url: '',
     bot_version: '1.0.0',
     orchestrator_version: '1.0.0'
   })
@@ -118,38 +119,59 @@ export default function SettingsClientPage() {
           </CardContent>
         </Card>
 
-        {/* Links Card */}
+        {/* Liens et URLs */}
         <Card className="bg-[#0A0A0A] border-white/[0.05]">
           <CardHeader>
             <div className="flex items-center gap-2 text-blue-500 mb-1">
               <Link className="w-5 h-5" />
-              <CardTitle>Liens & Support</CardTitle>
+              <CardTitle>Liens & Apparence</CardTitle>
             </div>
             <CardDescription className="text-[#a1a1aa]">
-              Configurez les liens d'invitation et de support affichés par les bots.
+              Configurez les liens publics et l'apparence du dashboard.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="support_link" className="text-[#fafafa]">Lien du Serveur Support</Label>
+              <Label htmlFor="support_link" className="text-[#fafafa]">Lien du Support (Discord)</Label>
               <div className="flex gap-2">
                 <Input 
                   id="support_link"
-                  placeholder="https://discord.gg/..." 
+                  placeholder="https://discord.gg/..."
                   value={settings.support_link || ''}
-                  onChange={(e) => setSettings({...settings, support_link: e.target.value})}
+                  onChange={(e) => setSettings({ ...settings, support_link: e.target.value })}
                   className="bg-black/50 border-white/[0.05] text-[#fafafa]"
                 />
                 <Button 
+                  size="icon" 
                   onClick={() => handleUpdate('support_link', settings.support_link)}
                   disabled={saving === 'support_link'}
-                  size="sm"
-                  className="gap-2"
                 >
                   {saving === 'support_link' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Sauvegarder
                 </Button>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dashboard_logo_url" className="text-[#fafafa]">URL du Logo du Dashboard</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="dashboard_logo_url"
+                  placeholder="https://.../logo.png"
+                  value={settings.dashboard_logo_url || ''}
+                  onChange={(e) => setSettings({ ...settings, dashboard_logo_url: e.target.value })}
+                  className="bg-black/50 border-white/[0.05] text-[#fafafa]"
+                />
+                <Button 
+                  size="icon" 
+                  onClick={() => handleUpdate('dashboard_logo_url', settings.dashboard_logo_url)}
+                  disabled={saving === 'dashboard_logo_url'}
+                >
+                  {saving === 'dashboard_logo_url' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                </Button>
+              </div>
+              <p className="text-[10px] text-[#a1a1aa] italic">
+                L'image s'affiche dans la barre latérale (format recommandé : carré, 128x128).
+              </p>
             </div>
           </CardContent>
         </Card>

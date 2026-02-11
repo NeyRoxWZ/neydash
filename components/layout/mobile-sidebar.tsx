@@ -9,9 +9,10 @@ import { SafeUser } from "./user-nav"
 
 interface MobileSidebarProps {
   user: SafeUser | null
+  logoUrl?: string
 }
 
-export function MobileSidebar({ user }: MobileSidebarProps) {
+export function MobileSidebar({ user, logoUrl }: MobileSidebarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
@@ -65,7 +66,7 @@ export function MobileSidebar({ user }: MobileSidebarProps) {
              <X className="h-5 w-5" />
            </button>
            
-           <Sidebar user={user} className="w-full border-r-0" />
+           <Sidebar user={user} logoUrl={logoUrl} className="w-full border-r-0" />
         </div>
       </div>
     </>

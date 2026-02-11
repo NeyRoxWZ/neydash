@@ -8,10 +8,13 @@ import { UserNav, SafeUser } from "./user-nav"
 
 interface SidebarProps {
   user: SafeUser | null
+  logoUrl?: string
   className?: string
 }
 
-export function Sidebar({ user, className }: SidebarProps) {
+export function Sidebar({ user, logoUrl, className }: SidebarProps) {
+  const defaultLogo = "https://cdn.discordapp.com/icons/1165696765480153119/a_3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d.png?size=128"
+  
   return (
     <aside
       className={cn(
@@ -22,13 +25,14 @@ export function Sidebar({ user, className }: SidebarProps) {
       <div className="flex h-14 items-center border-b border-border px-6">
         <Link href="/admin" className="flex items-center gap-2 font-bold text-lg tracking-tight">
           <img 
-            src="https://cdn.discordapp.com/icons/1165696765480153119/a_3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d.png?size=128" 
+            src={logoUrl || defaultLogo} 
             alt="Logo" 
             className="h-7 w-7 rounded-md object-cover border border-white/10"
             onError={(e) => {
               // Fallback si l'image ne charge pas
               e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
+              const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon');
+              if (fallback) fallback.classList.remove('hidden');
             }}
           />
           <div className="h-7 w-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 hidden fallback-icon" />
@@ -39,9 +43,9 @@ export function Sidebar({ user, className }: SidebarProps) {
       <div className="flex-1 overflow-y-auto py-6 px-3">
         <nav className="flex flex-col gap-1">
           <NavItem href="/admin" label="Dashboard" icon={LayoutDashboard} />
-          <NavItem href="/admin/licenses" label="Licenses" icon={Key} />
+          <NavItem href="/admin/licenses" label="Licences" icon={Key} />
           <NavItem href="/admin/instances" label="Instances" icon={Server} />
-          <NavItem href="/admin/settings" label="Settings" icon={Settings} />
+          <NavItem href="/admin/settings" label="Paramètres" icon={Settings} />
         </nav>
       </div>
 

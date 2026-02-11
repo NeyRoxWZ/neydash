@@ -19,6 +19,13 @@ export default async function AdminLayout({
     return redirect('/login')
   }
 
+  // Récupérer les paramètres pour le logo
+  const { data: settings } = await supabase.from('settings').select('*')
+  const settingsObj = (settings || []).reduce((acc: any, curr: any) => {
+    acc[curr.key] = curr.value
+    return acc
+  }, {})
+
   // Transform user to simple object to avoid serialization errors
   const safeUser = JSON.parse(JSON.stringify(user))
 
@@ -26,11 +33,11 @@ export default async function AdminLayout({
     <div className="flex min-h-screen bg-background">
       <CommandMenu />
       {/* Mobile Sidebar & Trigger */}
-      <MobileSidebar user={safeUser} />
+      <MobileSidebar user={safeUser} logoUrl={settingsObj.dashboard_logo_url} />
 
       {/* Desktop Sidebar - Fixed */}
       <div className="hidden md:block fixed inset-y-0 left-0 z-30">
-        <Sidebar user={safeUser} />
+        <Sidebar user={safeUser} logoUrl={settingsObj.dashboard_logo_url} />
       </div>
 
       {/* Main Content */}
