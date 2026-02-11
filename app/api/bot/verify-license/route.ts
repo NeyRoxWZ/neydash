@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ valid: false, error: 'Missing license key' }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const supabase = await createClient(true)
 
     // 1. Récupérer la licence
     const { data: license, error: licenseError } = await supabase
