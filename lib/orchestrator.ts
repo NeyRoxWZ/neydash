@@ -25,15 +25,23 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`Orchestrator error (${response.status}): ${errorText}`)
-      return { success: false, error: `Erreur Orchestrateur: ${response.statusText}` }
+      let errorText = ""
+      try {
+        errorText = await response.text()
+      } catch (e) {}
+      console.warn(`Orchestrator non-critical error (${response.status}): ${errorText || response.statusText}`)
+      return { success: false, error: `Indisponible (${response.status})` }
     }
 
     return await response.json()
   } catch (error: any) {
-    console.error('Fetch error to orchestrator:', error)
-    return { success: false, error: error.message || 'Erreur de connexion à l\'orchestrateur' }
+    // Ne pas log l'erreur complète si c'est juste une connexion refusée (orchestrateur éteint)
+    if (error.code === 'ECONNREFUSED') {
+      console.warn(`Orchestrator is offline at ${ORCHESTRATOR_URL}`)
+    } else {
+      console.error('Fetch error to orchestrator:', error)
+    }
+    return { success: false, error: 'Orchestrateur hors ligne' }
   }
 }
 

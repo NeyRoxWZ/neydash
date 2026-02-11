@@ -5,18 +5,21 @@ import { revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function getLicensesAction() {
-  const supabase = await createClient();
+  const supabase = await createClient(true);
   const { data, error } = await supabase
     .from('licenses')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error('Error fetching licenses:', error);
+    return [];
+  }
+  return data || [];
 }
 
 export async function createLicenseAction(durationDays: number | string) {
-  const supabase = await createClient();
+  const supabase = await createClient(true);
   
   // Generate a random 16-char license key
   const licenseKey = Math.random().toString(36).substring(2, 10).toUpperCase() + 
@@ -48,7 +51,7 @@ export async function createLicenseAction(durationDays: number | string) {
 }
 
 export async function updateLicenseAction(licenseKey: string, expiresAt: string) {
-  const supabase = await createClient();
+  const supabase = await createClient(true);
   const { error } = await supabase
     .from('licenses')
     .update({ expiresat: expiresAt })
@@ -60,7 +63,7 @@ export async function updateLicenseAction(licenseKey: string, expiresAt: string)
 }
 
 export async function deleteLicenseAction(licenseKey: string) {
-  const supabase = await createClient();
+  const supabase = await createClient(true);
   const { error } = await supabase
     .from('licenses')
     .delete()
