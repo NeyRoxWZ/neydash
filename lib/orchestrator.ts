@@ -1,5 +1,5 @@
-const ORCHESTRATOR_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL
-const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET || ''
+const ORCHESTRATOR_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || 'http://161.97.82.220:3000'
+const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET || 'a3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0'
 
 async function orchestratorFetch(path: string, options: RequestInit = {}) {
   if (!ORCHESTRATOR_URL) {
@@ -35,6 +35,8 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
 
     return await response.json()
   } catch (error: any) {
+    console.error('DEBUG - Full URL used:', fullUrl)
+    console.error('DEBUG - Secret length:', ORCHESTRATOR_SECRET.length)
     // Ne pas log l'erreur complète si c'est juste une connexion refusée (orchestrateur éteint)
     if (error.code === 'ECONNREFUSED') {
       console.warn(`Orchestrator is offline at ${ORCHESTRATOR_URL}`)
