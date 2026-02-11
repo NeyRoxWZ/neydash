@@ -19,7 +19,7 @@ import {
   updateLicenseAction 
 } from "./actions"
 import { toast } from "sonner"
-import { Plus, Edit, Trash2, Calendar, Clock, User, Key, Check, X, Copy } from "lucide-react"
+import { Plus, Edit, Trash2, Calendar, Clock, User, Key, Check, X, Copy, Search } from "lucide-react"
 
 interface License {
   id: string
