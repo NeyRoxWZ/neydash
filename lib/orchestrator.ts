@@ -2,6 +2,7 @@ const ORCHESTRATOR_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || 'http://161
 const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET || 'a3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0'
 
 async function orchestratorFetch(path: string, options: RequestInit = {}) {
+  let fullUrl = ''
   if (!ORCHESTRATOR_URL) {
     console.error('ORCHESTRATOR_URL is not defined in environment variables')
     return { 
@@ -12,7 +13,7 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
 
   try {
     const baseUrl = ORCHESTRATOR_URL.endsWith('/') ? ORCHESTRATOR_URL.slice(0, -1) : ORCHESTRATOR_URL
-    const fullUrl = `${baseUrl}${path.startsWith('/') ? path : '/' + path}`
+    fullUrl = `${baseUrl}${path.startsWith('/') ? path : '/' + path}`
     
     const response = await fetch(fullUrl, {
       ...options,
