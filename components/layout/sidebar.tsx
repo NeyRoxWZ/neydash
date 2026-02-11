@@ -21,7 +21,17 @@ export function Sidebar({ user, className }: SidebarProps) {
     >
       <div className="flex h-14 items-center border-b border-border px-6">
         <Link href="/admin" className="flex items-center gap-2 font-bold text-lg tracking-tight">
-          <div className="h-6 w-6 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500" />
+          <img 
+            src="https://cdn.discordapp.com/icons/1165696765480153119/a_3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d.png?size=128" 
+            alt="Logo" 
+            className="h-7 w-7 rounded-md object-cover border border-white/10"
+            onError={(e) => {
+              // Fallback si l'image ne charge pas
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
+            }}
+          />
+          <div className="h-7 w-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 hidden fallback-icon" />
           <span>NeySlotBot</span>
         </Link>
       </div>

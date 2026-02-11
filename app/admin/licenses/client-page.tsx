@@ -186,9 +186,21 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
                           <span className="text-sm font-medium">
                             {license.discord_username || "Utilisateur Inconnu"}
                           </span>
-                          <span className="text-[10px] text-muted-foreground font-mono">
-                            {license.client_id.substring(0, 8)}...
-                          </span>
+                          <div className="flex items-center gap-1.5 group/id">
+                            <span className="text-[10px] text-muted-foreground font-mono">
+                              {license.client_id}
+                            </span>
+                            <button 
+                              onClick={() => {
+                                navigator.clipboard.writeText(license.client_id || "")
+                                toast.success("ID copié !")
+                              }}
+                              className="opacity-0 group-hover/id:opacity-100 p-0.5 hover:bg-white/10 rounded transition-all"
+                              title="Copier l'ID"
+                            >
+                              <Copy className="w-2.5 h-2.5 text-muted-foreground" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ) : (

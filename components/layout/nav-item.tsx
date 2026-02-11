@@ -14,7 +14,12 @@ interface NavItemProps {
 
 export function NavItem({ href, label, icon: Icon, className }: NavItemProps) {
   const pathname = usePathname()
-  const isActive = pathname === href || pathname.startsWith(`${href}/`)
+  
+  // Si c'est le dashboard (/admin), on veut une correspondance exacte
+  // Sinon, pour les autres (/admin/licenses, etc.), on veut que ça reste actif si on est dans un sous-chemin
+  const isActive = href === "/admin" 
+    ? pathname === "/admin" 
+    : pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <Link
