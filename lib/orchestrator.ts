@@ -1,5 +1,7 @@
 const ORCHESTRATOR_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || 'http://161.97.82.220:3000'
 const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET || 'a3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0'
+console.log('DEBUG - Orchestrator URL:', ORCHESTRATOR_URL)
+console.log('DEBUG - Secret prefix:', ORCHESTRATOR_SECRET.substring(0, 5))
 
 async function orchestratorFetch(path: string, options: RequestInit = {}) {
   let fullUrl = ''

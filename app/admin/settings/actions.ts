@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { createClient } from '@/utils/supabase/server';
 import { setMaintenanceMode } from "@/lib/orchestrator"
 import { revalidatePath } from "next/cache"
 

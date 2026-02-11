@@ -1,10 +1,29 @@
 'use server';
 
 import { getOrchestratorStatus, restartBots, setMaintenanceMode } from '@/lib/orchestrator';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function getStatsAction() {
-  return await getOrchestratorStatus();
+  const stats = await getOrchestratorStatus();
+  
+  // Si l'orchestrateur ne peut pas récupérer les infos de maintenance depuis Supabase
+  // On le fait nous-mêmes avec les droits admin
+  if (stats && stats.success) {
+    const supabase = await createClient(true);
+    const { data: maintenanceSetting } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'maintenance_mode')
+      .single();
+    
+    return {
+      ...stats,
+      maintenance_mode: maintenanceSetting ? maintenanceSetting.value === 'true' : false
+    };
+  }
+  
+  return stats;
 }
 
 export async function restartBotsAction(type: 'all' | 'slotbot' | 'botgestion' = 'all') {
