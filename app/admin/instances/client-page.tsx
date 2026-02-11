@@ -21,7 +21,8 @@ import {
   Cpu,
   HardDrive,
   Activity,
-  AlertCircle
+  AlertCircle,
+  User
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
@@ -51,6 +52,8 @@ interface BotInstance {
   cpu: number
   license_key?: string
   client_id?: string
+  discord_username?: string
+  discord_avatar?: string
 }
 
 export default function InstancesClientPage() {
@@ -115,7 +118,9 @@ export default function InstancesClientPage() {
   const filteredInstances = instances.filter(bot => 
     bot.name.toLowerCase().includes(search.toLowerCase()) ||
     bot.slot_id.toString().includes(search) ||
-    bot.license_key?.toLowerCase().includes(search.toLowerCase())
+    bot.license_key?.toLowerCase().includes(search.toLowerCase()) ||
+    bot.client_id?.toLowerCase().includes(search.toLowerCase()) ||
+    bot.discord_username?.toLowerCase().includes(search.toLowerCase())
   )
 
   const getStatusColor = (status: string) => {
@@ -182,8 +187,9 @@ export default function InstancesClientPage() {
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent border-white/[0.05]">
-              <TableHead className="w-[100px]">Slot</TableHead>
+              <TableHead className="w-[80px]">Slot</TableHead>
               <TableHead>Nom du Processus</TableHead>
+              <TableHead>Utilisateur</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead>CPU / RAM</TableHead>
               <TableHead>Uptime</TableHead>
@@ -193,14 +199,14 @@ export default function InstancesClientPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                   <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
                   Chargement des instances...
                 </TableCell>
               </TableRow>
             ) : filteredInstances.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                   Aucune instance trouvée.
                 </TableCell>
               </TableRow>
@@ -217,6 +223,33 @@ export default function InstancesClientPage() {
                         {bot.type}
                       </span>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {bot.client_id ? (
+                      <div className="flex items-center gap-2">
+                        {bot.discord_avatar ? (
+                          <img 
+                            src={`https://cdn.discordapp.com/avatars/${bot.client_id}/${bot.discord_avatar}.png`} 
+                            alt="Avatar" 
+                            className="w-6 h-6 rounded-full border border-white/10"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center border border-white/10">
+                            <User className="w-3 h-3 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className="text-xs font-medium">
+                            {bot.discord_username || "Inconnu"}
+                          </span>
+                          <span className="text-[9px] text-muted-foreground font-mono">
+                            {bot.client_id.substring(0, 8)}...
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground italic text-xs">---</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(bot.status)}`}>

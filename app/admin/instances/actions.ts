@@ -1,6 +1,7 @@
 "use server"
 
 import { getOrchestratorStatus, restartInstance, stopInstance, deleteInstance } from "@/lib/orchestrator"
+import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
 export async function fetchInstancesAction() {
@@ -9,9 +10,34 @@ export async function fetchInstancesAction() {
     return { success: false, error: "Impossible de récupérer les instances" }
   }
   
+  const bots = status.bots || []
+  
+  // Enrichir avec les données Discord de Supabase
+  try {
+    const supabase = await createClient(true)
+    const { data: licenses } = await supabase
+      .from('licenses')
+      .select('license_key, discord_username, discord_avatar, client_id')
+      .in('license_key', bots.map((b: any) => b.license_key).filter(Boolean))
+
+    if (licenses) {
+      const licenseMap = new Map(licenses.map(l => [l.license_key, l]))
+      bots.forEach((bot: any) => {
+        if (bot.license_key && licenseMap.has(bot.license_key)) {
+          const l = licenseMap.get(bot.license_key)
+          bot.discord_username = l.discord_username
+          bot.discord_avatar = l.discord_avatar
+          bot.client_id = l.client_id
+        }
+      });
+    }
+  } catch (err) {
+    console.error('Error enriching instances:', err)
+  }
+  
   return { 
     success: true, 
-    bots: status.bots || [],
+    bots: bots,
     stats: status.stats || {}
   }
 }

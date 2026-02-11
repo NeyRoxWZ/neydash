@@ -28,10 +28,13 @@ interface License {
   client_id: string | null
   expiresat: string | null
   created_at: string
+  discord_username?: string | null
+  discord_avatar?: string | null
 }
 
 export default function LicensesClientPage({ initialLicenses }: { initialLicenses: License[] }) {
   const [licenses, setLicenses] = useState<License[]>(initialLicenses)
+  const [search, setSearch] = useState("")
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -44,6 +47,12 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
 
   // Edit Modal State
   const [editExpiresAt, setEditExpiresAt] = useState("")
+
+  const filteredLicenses = licenses.filter(license => 
+    license.license_key.toLowerCase().includes(search.toLowerCase()) ||
+    (license.client_id && license.client_id.toLowerCase().includes(search.toLowerCase())) ||
+    (license.discord_username && license.discord_username.toLowerCase().includes(search.toLowerCase()))
+  )
 
   const handleCreateLicense = async () => {
     try {
@@ -109,6 +118,22 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
         </Button>
       </div>
 
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input 
+            placeholder="Rechercher par clé, ID ou pseudo..." 
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border">
+          <Key className="w-3 h-3" />
+          <span>{filteredLicenses.length} licences trouvées</span>
+        </div>
+      </div>
+
       <div className="rounded-md border border-[#27272a] bg-[#09090b]">
         <Table>
           <TableHeader>
@@ -121,14 +146,14 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
             </TableRow>
           </TableHeader>
           <TableBody>
-            {licenses.length === 0 ? (
+            {filteredLicenses.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                   Aucune licence trouvée.
                 </TableCell>
               </TableRow>
             ) : (
-              licenses.map((license) => (
+              filteredLicenses.map((license) => (
                 <TableRow key={license.id}>
                   <TableCell className="w-[280px]">
                     <DoubleClickReveal 
@@ -143,13 +168,29 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
                        license.status === 'expired' ? 'EXPIRÉE' : license.status}
                     </span>
                   </TableCell>
-                  <TableCell className="w-[200px]">
+                  <TableCell>
                     {license.client_id ? (
-                      <DoubleClickReveal 
-                        value={license.client_id} 
-                        label="Client ID"
-                        masked={license.client_id.substring(0, 4) + "****"}
-                      />
+                      <div className="flex items-center gap-2">
+                        {license.discord_avatar ? (
+                          <img 
+                            src={`https://cdn.discordapp.com/avatars/${license.client_id}/${license.discord_avatar}.png`} 
+                            alt="Avatar" 
+                            className="w-6 h-6 rounded-full border border-white/10"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center border border-white/10">
+                            <User className="w-3 h-3 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {license.discord_username || "Utilisateur Inconnu"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            {license.client_id.substring(0, 8)}...
+                          </span>
+                        </div>
+                      </div>
                     ) : (
                       <span className="text-muted-foreground italic text-xs">Non activée</span>
                     )}
