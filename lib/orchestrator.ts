@@ -89,14 +89,6 @@ export async function deleteInstance(id: string | number, type: string) {
   })
 }
 
-export async function getLogs(botId?: string, lines: number = 100) {
-  let url = '/api/logs'
-  const params = new URLSearchParams()
-  if (botId) params.append('botId', botId)
-  if (lines) params.append('lines', lines.toString())
-  
-  const queryString = params.toString()
-  if (queryString) url += `?${queryString}`
-  
-  return orchestratorFetch(url)
+export async function getLogs(name: string, lines: number = 100) {
+  return orchestratorFetch(`/api/logs/${name}?lines=${lines}`)
 }
