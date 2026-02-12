@@ -24,8 +24,7 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      cache: 'no-store',
-      next: { revalidate: 0 } // Désactiver tout cache Next.js
+      cache: 'no-store'
     })
 
     if (!response.ok) {
