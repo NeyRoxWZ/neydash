@@ -105,6 +105,13 @@ export async function deleteInstance(id: string | number, type: string) {
   })
 }
 
+export async function deleteInstanceByLicense(license_key: string) {
+  return orchestratorFetch('/api/delete-by-license', {
+    method: 'POST',
+    body: JSON.stringify({ license_key })
+  })
+}
+
 export async function launchInstance(license_key: string, token_encrypted: string, client_id: string) {
   return orchestratorFetch('/api/launch-bot', {
     method: 'POST',

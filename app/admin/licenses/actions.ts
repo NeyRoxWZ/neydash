@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
-import { deleteInstance } from '@/lib/orchestrator';
+import { deleteInstance, deleteInstanceByLicense } from '@/lib/orchestrator';
 
 export async function getLicensesAction() {
   const supabase = await createClient(true);
@@ -66,21 +66,18 @@ export async function updateLicenseAction(licenseKey: string, expiresAt: string)
 export async function deleteLicenseAction(licenseKey: string) {
   const supabase = await createClient(true);
   
-  // 1. Chercher si une instance est liée à cette licence
-  const { data: instance } = await supabase
-    .from('botinstances')
-    .select('slot_id, type')
-    .eq('license_key', licenseKey)
-    .single();
-
-  // 2. Si une instance existe, on la supprime de l'orchestrateur (PM2)
-  if (instance) {
-    console.log(`Suppression de l'instance PM2 pour la licence ${licenseKey} (slot: ${instance.slot_id})`);
-    await deleteInstance(instance.slot_id, instance.type);
-    
-    // Supprimer aussi de la table botinstances
-    await supabase.from('botinstances').delete().eq('license_key', licenseKey);
+  // 1. Demander à l'orchestrateur de supprimer tout bot lié à cette licence
+  // On fait ça en premier pour être sûr que le bot s'arrête même si la DB est mal synchronisée
+  try {
+    console.log(`Demande de suppression de l'instance pour la licence ${licenseKey}`);
+    await deleteInstanceByLicense(licenseKey);
+  } catch (err) {
+    console.error(`Erreur lors de la suppression de l'instance via orchestrateur:`, err);
+    // On continue quand même pour nettoyer la DB
   }
+
+  // 2. Nettoyer la table botinstances au cas où
+  await supabase.from('botinstances').delete().eq('license_key', licenseKey);
 
   // 3. Supprimer la licence elle-même
   const { error } = await supabase
