@@ -48,11 +48,14 @@ export default function LicensesClientPage({ initialLicenses }: { initialLicense
   // Edit Modal State
   const [editExpiresAt, setEditExpiresAt] = useState("")
 
-  const filteredLicenses = licenses.filter(license => 
-    license.license_key.toLowerCase().includes(search.toLowerCase()) ||
-    (license.client_id && license.client_id.toLowerCase().includes(search.toLowerCase())) ||
-    (license.discord_username && license.discord_username.toLowerCase().includes(search.toLowerCase()))
-  )
+  const filteredLicenses = licenses.filter(license => {
+    const s = search.toLowerCase();
+    return (
+      (license.license_key?.toLowerCase() || "").includes(s) ||
+      (license.client_id?.toLowerCase() || "").includes(s) ||
+      (license.discord_username?.toLowerCase() || "").includes(s)
+    );
+  })
 
   const handleCreateLicense = async () => {
     try {

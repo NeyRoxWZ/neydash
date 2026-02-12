@@ -115,13 +115,16 @@ export default function InstancesClientPage() {
     }
   }
 
-  const filteredInstances = instances.filter(bot => 
-    bot.name.toLowerCase().includes(search.toLowerCase()) ||
-    bot.slot_id.toString().includes(search) ||
-    bot.license_key?.toLowerCase().includes(search.toLowerCase()) ||
-    bot.client_id?.toLowerCase().includes(search.toLowerCase()) ||
-    bot.discord_username?.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredInstances = instances.filter(bot => {
+    const s = search.toLowerCase();
+    return (
+      (bot.name?.toLowerCase() || "").includes(s) ||
+      (bot.slot_id?.toString() || "").includes(search) ||
+      (bot.license_key?.toLowerCase() || "").includes(s) ||
+      (bot.client_id?.toLowerCase() || "").includes(s) ||
+      (bot.discord_username?.toLowerCase() || "").includes(s)
+    );
+  })
 
   const getStatusColor = (status: string) => {
     switch (status) {
