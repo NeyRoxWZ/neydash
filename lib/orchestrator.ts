@@ -1,5 +1,5 @@
 const ORCHESTRATOR_URL = process.env.NEXT_PUBLIC_ORCHESTRATOR_URL || 'http://161.97.82.220:3000'
-const ORCHESTRATOR_SECRET = process.env.ORCHESTRATOR_SECRET || 'a3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0'
+const ORCHESTRATOR_SECRET = (process.env.ORCHESTRATOR_SECRET || 'a3f8b2c1d9e4f7a6b5c8d1e9f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0').trim()
 console.log('DEBUG - Orchestrator URL:', ORCHESTRATOR_URL)
 console.log('DEBUG - Secret prefix:', ORCHESTRATOR_SECRET.substring(0, 5))
 
@@ -28,12 +28,28 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
     })
 
     if (!response.ok) {
-      let errorText = ""
+      let errorData: any = null
       try {
-        errorText = await response.text()
+        const text = await response.text()
+        try {
+          errorData = JSON.parse(text)
+        } catch (e) {
+          errorData = { error: text }
+        }
       } catch (e) {}
-      console.warn(`Orchestrator non-critical error (${response.status}): ${errorText || response.statusText}`)
-      return { success: false, error: `Indisponible (${response.status})` }
+      
+      const errorMessage = errorData?.error || response.statusText
+      console.warn(`Orchestrator error (${response.status}):`, errorData || response.statusText)
+      
+      // Si on a des infos de debug (mismatch token), on les affiche dans la console serveur
+      if (errorData?.debug) {
+        console.error(`[Auth Debug] Received: ${errorData.debug.received}, Expected: ${errorData.debug.expected}`)
+      }
+
+      return { 
+        success: false, 
+        error: `Erreur ${response.status}: ${errorMessage}` 
+      }
     }
 
     return await response.json()
@@ -51,6 +67,12 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
 }
 
 export async function getOrchestratorStatus() {
+  // Test auth first (log only)
+  orchestratorFetch('/api/test-auth').then(res => {
+    if (!res.success) console.error('[Orchestrator Auth Test Failed]', res.error)
+    else console.log('[Orchestrator Auth Test Success]')
+  }).catch(() => {})
+  
   return orchestratorFetch('/api/stats')
 }
 
