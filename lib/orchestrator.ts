@@ -39,11 +39,11 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
       } catch (e) {}
       
       const errorMessage = errorData?.error || response.statusText
-      console.warn(`Orchestrator error (${response.status}):`, errorData || response.statusText)
+      console.warn(`Orchestrator error (${response.status}) on ${path}:`, errorData || response.statusText)
       
       // Si on a des infos de debug (mismatch token), on les affiche dans la console serveur
       if (errorData?.debug) {
-        console.error(`[Auth Debug] Received: ${errorData.debug.received}, Expected: ${errorData.debug.expected}`)
+        console.error(`[Auth Debug] Received: ${errorData.debug.received} (Len: ${errorData.debug.received_length}), Expected: ${errorData.debug.expected} (Len: ${errorData.debug.expected_length})`)
       }
 
       return { 
