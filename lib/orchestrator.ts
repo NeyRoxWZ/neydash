@@ -67,12 +67,6 @@ async function orchestratorFetch(path: string, options: RequestInit = {}) {
 }
 
 export async function getOrchestratorStatus() {
-  // Test auth first (log only)
-  orchestratorFetch('/api/test-auth').then(res => {
-    if (!res.success) console.error('[Orchestrator Auth Test Failed]', res.error)
-    else console.log('[Orchestrator Auth Test Success]')
-  }).catch(() => {})
-  
   return orchestratorFetch('/api/stats')
 }
 

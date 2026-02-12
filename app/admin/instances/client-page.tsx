@@ -98,13 +98,9 @@ export default function InstancesClientPage() {
     
     try {
       let res;
-      if (action === 'restart') res = await restartInstanceAction(bot.slot_id, bot.type)
+      if (action === 'restart' || action === 'start') res = await restartInstanceAction(bot.slot_id, bot.type)
       else if (action === 'stop') res = await stopInstanceAction(bot.slot_id, bot.type)
       else if (action === 'delete') res = await deleteInstanceAction(bot.slot_id, bot.type)
-      else if (action === 'start') {
-        if (!bot.license_key) throw new Error("Clé de licence manquante")
-        res = await launchInstanceAction(bot.license_key, bot.client_id || '')
-      }
       
       if (res && res.success) {
         toast.success(`Action ${action} réussie`)
