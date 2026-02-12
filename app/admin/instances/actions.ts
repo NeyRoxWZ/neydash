@@ -1,6 +1,6 @@
 "use server"
 
-import { getOrchestratorStatus, restartInstance, stopInstance, deleteInstance } from "@/lib/orchestrator"
+import { getOrchestratorStatus, restartInstance, stopInstance, deleteInstance, launchInstance } from "@/lib/orchestrator"
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
@@ -15,10 +15,11 @@ export async function fetchInstancesAction() {
   // Enrichir avec les données Discord de Supabase
   try {
     const supabase = await createClient(true)
+    
+    // On récupère toutes les licences pour faire une jointure propre
     const { data: licenses } = await supabase
       .from('licenses')
       .select('license_key, discord_username, discord_avatar, client_id')
-      .in('license_key', bots.map((b: any) => b.license_key).filter(Boolean))
 
     if (licenses) {
       const licenseMap = new Map(licenses.map(l => [l.license_key, l]))
@@ -26,7 +27,7 @@ export async function fetchInstancesAction() {
         if (bot.license_key && licenseMap.has(bot.license_key)) {
           const l = licenseMap.get(bot.license_key)
           if (l) {
-            bot.discord_username = l.discord_username
+            bot.discord_username = l.discord_username || "Utilisateur inconnu"
             bot.discord_avatar = l.discord_avatar
             bot.client_id = l.client_id
           }
@@ -69,4 +70,28 @@ export async function deleteInstanceAction(slot_id: number, type: 'slotbot' | 'b
     revalidatePath('/admin')
   }
   return res
+}
+
+export async function launchInstanceAction(license_key: string, client_id: string) {
+  try {
+    const supabase = await createClient(true)
+    const { data: tokenData } = await supabase
+      .from('bottokens')
+      .select('token_encrypted')
+      .eq('license_key', license_key)
+      .single()
+
+    if (!tokenData || !tokenData.token_encrypted) {
+      return { success: false, error: "Aucun token configuré pour cette licence." }
+    }
+
+    const res = await launchInstance(license_key, tokenData.token_encrypted, client_id)
+    if (res.success) {
+      revalidatePath('/admin/instances')
+      revalidatePath('/admin')
+    }
+    return res
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
 }

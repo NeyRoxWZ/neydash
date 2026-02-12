@@ -69,23 +69,30 @@ export async function restartBots(type: 'all' | 'slotbot' | 'botgestion') {
 }
 
 export async function restartInstance(id: string | number, type: string) {
-  return orchestratorFetch(`/api/instances/${id}/restart`, { 
+  return orchestratorFetch('/api/restart-bot', { 
     method: 'POST',
-    body: JSON.stringify({ type })
+    body: JSON.stringify({ slot_id: id, type })
   })
 }
 
 export async function stopInstance(id: string | number, type: string) {
-  return orchestratorFetch(`/api/instances/${id}/stop`, { 
+  return orchestratorFetch('/api/stop-bot', { 
     method: 'POST',
-    body: JSON.stringify({ type })
+    body: JSON.stringify({ slot_id: id, type })
   })
 }
 
 export async function deleteInstance(id: string | number, type: string) {
-  return orchestratorFetch(`/api/instances/${id}`, { 
-    method: 'DELETE',
-    body: JSON.stringify({ type })
+  return orchestratorFetch('/api/delete-bot', { 
+    method: 'POST',
+    body: JSON.stringify({ slot_id: id, type })
+  })
+}
+
+export async function launchInstance(license_key: string, token_encrypted: string, client_id: string) {
+  return orchestratorFetch('/api/launch-bot', {
+    method: 'POST',
+    body: JSON.stringify({ license_key, token_encrypted, client_id })
   })
 }
 

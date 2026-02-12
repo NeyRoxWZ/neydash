@@ -30,7 +30,8 @@ import {
   fetchInstancesAction, 
   restartInstanceAction, 
   stopInstanceAction,
-  deleteInstanceAction
+  deleteInstanceAction,
+  launchInstanceAction
 } from "./actions"
 import {
   Dialog,
@@ -91,8 +92,8 @@ export default function InstancesClientPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleAction = async (bot: BotInstance, action: 'restart' | 'stop' | 'delete') => {
-    const actionId = `${action}-${bot.slot_id}`
+  const handleAction = async (bot: BotInstance, action: 'restart' | 'stop' | 'delete' | 'start') => {
+    const actionId = `${action}-${bot.slot_id || bot.license_key}`
     setIsActionLoading(actionId)
     
     try {
@@ -100,15 +101,19 @@ export default function InstancesClientPage() {
       if (action === 'restart') res = await restartInstanceAction(bot.slot_id, bot.type)
       else if (action === 'stop') res = await stopInstanceAction(bot.slot_id, bot.type)
       else if (action === 'delete') res = await deleteInstanceAction(bot.slot_id, bot.type)
+      else if (action === 'start') {
+        if (!bot.license_key) throw new Error("Clé de licence manquante")
+        res = await launchInstanceAction(bot.license_key, bot.client_id || '')
+      }
       
-      if (res.success) {
-        toast.success(`Action ${action} réussie pour le slot ${bot.slot_id}`)
+      if (res && res.success) {
+        toast.success(`Action ${action} réussie`)
         fetchInstances()
       } else {
-        toast.error(`Erreur: ${res.error}`)
+        toast.error(`Erreur: ${res?.error || 'Inconnue'}`)
       }
-    } catch (err) {
-      toast.error(`Erreur lors de l'action ${action}`)
+    } catch (err: any) {
+      toast.error(`Erreur lors de l'action ${action}: ${err.message}`)
     } finally {
       setIsActionLoading(null)
       if (action === 'delete') setIsDeleteModalOpen(false)
@@ -283,26 +288,41 @@ export default function InstancesClientPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 hover:bg-blue-500/10 hover:text-blue-500"
-                        title="Redémarrer"
-                        onClick={() => handleAction(bot, 'restart')}
-                        disabled={isActionLoading === `restart-${bot.slot_id}`}
-                      >
-                        <RotateCcw className={`w-4 h-4 ${isActionLoading === `restart-${bot.slot_id}` ? 'animate-spin' : ''}`} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 hover:bg-yellow-500/10 hover:text-yellow-500"
-                        title="Arrêter"
-                        onClick={() => handleAction(bot, 'stop')}
-                        disabled={isActionLoading === `stop-${bot.slot_id}`}
-                      >
-                        <Square className="w-4 h-4" />
-                      </Button>
+                      {bot.status === 'stopped' ? (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 hover:bg-green-500/10 hover:text-green-500"
+                          title="Démarrer"
+                          onClick={() => handleAction(bot, 'start')}
+                          disabled={isActionLoading === `start-${bot.slot_id || bot.license_key}`}
+                        >
+                          <Play className={`w-4 h-4 ${isActionLoading === `start-${bot.slot_id || bot.license_key}` ? 'animate-pulse' : ''}`} />
+                        </Button>
+                      ) : (
+                        <>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 hover:bg-blue-500/10 hover:text-blue-500"
+                            title="Redémarrer"
+                            onClick={() => handleAction(bot, 'restart')}
+                            disabled={isActionLoading === `restart-${bot.slot_id}`}
+                          >
+                            <RotateCcw className={`w-4 h-4 ${isActionLoading === `restart-${bot.slot_id}` ? 'animate-spin' : ''}`} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 hover:bg-yellow-500/10 hover:text-yellow-500"
+                            title="Arrêter"
+                            onClick={() => handleAction(bot, 'stop')}
+                            disabled={isActionLoading === `stop-${bot.slot_id}`}
+                          >
+                            <Square className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
                       <Button 
                         variant="ghost" 
                         size="icon" 
