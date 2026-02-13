@@ -45,8 +45,8 @@ export async function fetchInstancesAction() {
   }
 }
 
-export async function restartInstanceAction(slot_id: number, type: 'slotbot' | 'botgestion') {
-  const res = await restartInstance(slot_id, type)
+export async function restartInstanceAction(slot_id: number, type: 'slotbot' | 'botgestion', deploy_commands: boolean = false) {
+  const res = await restartInstance(slot_id, type, deploy_commands)
   if (res.success) {
     revalidatePath('/admin/instances')
     revalidatePath('/admin')

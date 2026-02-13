@@ -84,10 +84,10 @@ export async function restartBots(type: 'all' | 'slotbot' | 'botgestion') {
   })
 }
 
-export async function restartInstance(id: string | number, type: string) {
+export async function restartInstance(id: string | number, type: string, deploy_commands: boolean = false) {
   return orchestratorFetch('/api/restart-bot', { 
     method: 'POST',
-    body: JSON.stringify({ slot_id: id, type })
+    body: JSON.stringify({ slot_id: id, type, deploy_commands })
   })
 }
 
